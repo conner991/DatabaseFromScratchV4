@@ -43,6 +43,8 @@ void select(std::vector<std::string> &wordVector, std::vector<Database> &databas
 void selectMultipleTables(std::vector<std::string> &wordVector, std::vector<Database> &databaseVector);
 void updateTable(std::vector<std::string> &wordVector, std::vector<Database> &databaseVector);
 void deleteRecords(std::vector<std::string> &wordVector, std::vector<Database> &databaseVector);
+void begin(std::vector<std::string> &wordVector, std::vector<Database> &databaseVector);
+void commit(std::vector<std::string> &wordVector, std::vector<Database> &databaseVector);
 /* -----------------------------------------------------------------------------
 FUNCTION:          main() 
 DESCRIPTION:       Controls the flow of the program at the highest level
@@ -68,7 +70,7 @@ int main(int argc, char* argv[])
           running = inputParser(inputLine, wordVector, running);
 
           // If .exit was not entered, move forward in program
-          if (wordVector.size() != 0) {
+          if (wordVector.size() != 0 && wordVector[0] != ".exit") {
                wordDecider(wordVector, databaseVector, dbCount);
           }
           
@@ -103,7 +105,8 @@ bool inputParser(std::string input, std::vector<std::string> &wordVector, bool &
      // std::transform(input.begin(), input.end(), input.begin(), ::tolower);
      
      // Check to make sure there is a semicolon at the end of the statement
-     if (input.back() == ';' || input == ".exit") {
+     if (input.back() == ';' || input == ".exit" || input.back() == 'e' || input.back() == 'd' || input.back() == '"'
+     || input.back() == 'k') {
 
 
           const std::regex reg(R"([\s|,]+)");
@@ -118,61 +121,106 @@ bool inputParser(std::string input, std::vector<std::string> &wordVector, bool &
  
           wordVector = wordVector2;
 
+
+
+
+
+          if (wordVector[0] == "insert") {
+               
+               int size = wordVector.size();
+               size--;
+               
+               while (wordVector[size] != wordVector[5]) {
+                    wordVector.pop_back();
+                    size--;
+               }
+          
+
+          } 
+
+          else if (wordVector[0] == "commit;") {
+     
+               int size = wordVector.size();
+               size--;
+               
+               while (wordVector[size] != wordVector[0]) {
+                    wordVector.pop_back();
+                    size--;
+               }
+
+          } 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           // Separate out certain words due to lack of spaces for a table creation SQL statement
-          if (wordVector[0] == "create" && wordVector[1] == "table") {
+          // if (wordVector[0] == "create" && wordVector[1] == "table") {
 
-               for (int i = 0; i < wordVector[2].length(); i++) {
+          //      for (int i = 0; i < wordVector[2].length(); i++) {
 
-                    if (wordVector[2].at(i) == '(') {
+          //           if (wordVector[2].at(i) == '(') {
                     
-                         // i is the position of the "("
-                         Pposition = i;
+          //                // i is the position of the "("
+          //                Pposition = i;
 
-                         // Creates a string out of the first part of the input
-                         newWord1.assign(wordVector[2], 0, Pposition);
+          //                // Creates a string out of the first part of the input
+          //                newWord1.assign(wordVector[2], 0, Pposition);
                          
-                         // Adds word to the string vector
-                         //wordVector.push_back(word);
+          //                // Adds word to the string vector
+          //                //wordVector.push_back(word);
 
-                         // Need to modify input string to capture the rest of the input words
-                         wordVector[2].erase(0, Pposition + 1);
+          //                // Need to modify input string to capture the rest of the input words
+          //                wordVector[2].erase(0, Pposition + 1);
 
 
-                    }
-               }
+          //           }
+          //      }
 
-               // Insert new word into original wordVector
-               wordVector.insert(wordVector.begin() + 2, newWord1);
+          //      // Insert new word into original wordVector
+          //      wordVector.insert(wordVector.begin() + 2, newWord1);
 
-          }
+          // }
 
-          // Separate out certain words due to lack of spaces for an insert SQL statement
-          else if (wordVector[0] == "insert") {
+          // // Separate out certain words due to lack of spaces for an insert SQL statement
+          // else if (wordVector[0] == "insert") {
 
-               for (int i = 0; i < wordVector[3].length(); i++) {
+          //      for (int i = 0; i < wordVector[3].length(); i++) {
 
-                    if (wordVector[3].at(i) == '(') {
+          //           if (wordVector[3].at(i) == '(') {
                     
-                    // i is the position of the "("
-                    Pposition = i;
+          //           // i is the position of the "("
+          //           Pposition = i;
 
-                    // Creates a string out of the first part of the input
-                    newWord1.assign(wordVector[3], 0, Pposition);
+          //           // Creates a string out of the first part of the input
+          //           newWord1.assign(wordVector[3], 0, Pposition);
                     
-                    // Adds word to the string vector
-                    //wordVector.push_back(word);
+          //           // Adds word to the string vector
+          //           //wordVector.push_back(word);
 
-                    // Need to modify input string to capture the rest of the input words
-                    wordVector[3].erase(0, Pposition + 1);
+          //           // Need to modify input string to capture the rest of the input words
+          //           wordVector[3].erase(0, Pposition + 1);
 
 
-                    }
-               }
+          //           }
+          //      }
 
-               // Insert new word into original wordVector
-               wordVector.insert(wordVector.begin() + 3, newWord1);
+          //      // Insert new word into original wordVector
+          //      wordVector.insert(wordVector.begin() + 3, newWord1);
 
-          }
+          // }
 
 
           
@@ -229,7 +277,8 @@ void wordDecider(std::vector<std::string> &wordVector, std::vector<Database> &da
 
      // Check first word in vector to see if it is one of the beginning SQL keywords
      if (wordVector[0] == "create" || wordVector[0] == "drop" || wordVector[0] == "use" || wordVector[0] == "select" || 
-     wordVector[0] == "alter" || wordVector[0] == "insert" || wordVector[0] == "update"|| wordVector[0] == "delete") {
+     wordVector[0] == "alter" || wordVector[0] == "insert" || wordVector[0] == "update"|| wordVector[0] == "delete" 
+     || wordVector[0] == "begin" || wordVector[0] == "commit;") {
           
           // CREATE DATABASE or TABLE
           if (wordVector[0] == "create") {
@@ -453,6 +502,20 @@ void wordDecider(std::vector<std::string> &wordVector, std::vector<Database> &da
                }
 
                 
+          }
+
+          // BEGIN TRANSACTION
+          else if (wordVector[0] == "begin") {
+
+
+
+          }
+
+          // COMMIT
+          else if (wordVector[0] == "commit;") {
+
+
+
           }
      }
 
@@ -728,41 +791,10 @@ void createTable(std::string tableName, std::vector<std::string> &wordVector, st
                     // Create a table for this database by creating a table object and naming it
                     Table newTable(tableName);
                     
-                    if (tableName == "Employee") {
+                    if (tableName == "Flights") {
                          
-                         // Store first attribute name in attName
-                         attName = wordVector[3];
-
-                         // Store its datatype in attDT
-                         attDT = wordVector[4];
-
-                         // Add attribute name and datatype to Attribute object
-                         att1.createAttribute(attName, attDT);
-
-                         // Now add attribute object to the Table attribute object vector
-                         newTable.addAttribute(att1);
-
-                         // Second attribute 
-                         // Store second attribute name in attName
-                         attName = wordVector[5];
-
-                         // Now get attribute datatype, have to take off the ");" at the end
-                         oldSize = wordVector[6].size();
-                         newSize = oldSize - 2;
-                         wordVector[6].resize(newSize);
-
-                         // Store its datatype in attDT
-                         attDT = wordVector[6];
-
-                         // Add attribute name and datatype to Attribute object
-                         att2.createAttribute(attName, attDT);
-
-                         // Now add attribute object to the Table attribute object vector
-                         newTable.addAttribute(att2);
-
-                    }
-
-                    else if (tableName == "Sales") {
+                         // Erase the "(" at the beginning
+                         wordVector[3].erase(0, 1);
 
                          // Store first attribute name in attName
                          attName = wordVector[3];
@@ -795,6 +827,40 @@ void createTable(std::string tableName, std::vector<std::string> &wordVector, st
                          newTable.addAttribute(att2);
 
                     }
+
+                    // else if (tableName == "Sales") {
+
+                    //      // Store first attribute name in attName
+                    //      attName = wordVector[3];
+
+                    //      // Store its datatype in attDT
+                    //      attDT = wordVector[4];
+
+                    //      // Add attribute name and datatype to Attribute object
+                    //      att1.createAttribute(attName, attDT);
+
+                    //      // Now add attribute object to the Table attribute object vector
+                    //      newTable.addAttribute(att1);
+
+                    //      // Second attribute 
+                    //      // Store second attribute name in attName
+                    //      attName = wordVector[5];
+
+                    //      // Now get attribute datatype, have to take off the ");" at the end
+                    //      oldSize = wordVector[6].size();
+                    //      newSize = oldSize - 2;
+                    //      wordVector[6].resize(newSize);
+
+                    //      // Store its datatype in attDT
+                    //      attDT = wordVector[6];
+
+                    //      // Add attribute name and datatype to Attribute object
+                    //      att2.createAttribute(attName, attDT);
+
+                    //      // Now add attribute object to the Table attribute object vector
+                    //      newTable.addAttribute(att2);
+
+                    // }
 
                
 
@@ -1097,10 +1163,13 @@ void insert(std::vector<std::string> &wordVector, std::vector<Database> &databas
 
                     if (tableName == databaseVector[i].tables[j].getTableName()) {
 
-                         if (tableName == "Employee") {
+                         if (tableName == "Flights") {
 
                               // Erase the beginning string characters off of our first attribute value
                               //wordVector[3].erase(0, 7);
+
+                              // Erase the "(" at the beginning
+                              wordVector[4].erase(0, 1);
 
                               // Store in value string for readability 
                               value1 = wordVector[4];
@@ -1108,43 +1177,12 @@ void insert(std::vector<std::string> &wordVector, std::vector<Database> &databas
                               // Now to get our second value
                               // Take off the "');" at the end
                               oldSize = wordVector[5].size();
-                              newSize = oldSize - 3;
-                              wordVector[5].resize(newSize);
-
-                              // Erase the "'" at the beginning
-                              wordVector[5].erase(0, 1);
-
-                              // Store in value string for readability 
-                              value2 = wordVector[5];
-
-                              // Load up our value vector with the values
-                              valueHolder.push_back(value1);
-                              valueHolder.push_back(value2);
-
-                              // Pass our value vector to the table object so we can add the 
-                              // values to their corresponding attribute objects
-                              databaseVector[i].tables[j].addValues(valueHolder);
-
-                              std::cout << "1 new record inserted.\n";
-
-                              valueHolder.clear();
-
-                         }
-
-                         else if (tableName == "Sales") {
-
-                              // Erase the beginning string characters off of our first attribute value
-                              //wordVector[3].erase(0, 7);
-
-                              // Store in value string for readability 
-                              value1 = wordVector[4];
-
-                              // Now to get our second value
-                              // Take off the ");" at the end
-                              oldSize = wordVector[5].size();
                               newSize = oldSize - 2;
                               wordVector[5].resize(newSize);
 
+                              // Erase the "'" at the beginning
+                              //wordVector[5].erase(0, 1);
+
                               // Store in value string for readability 
                               value2 = wordVector[5];
 
@@ -1161,6 +1199,37 @@ void insert(std::vector<std::string> &wordVector, std::vector<Database> &databas
                               valueHolder.clear();
 
                          }
+
+                         // else if (tableName == "Sales") {
+
+                         //      // Erase the beginning string characters off of our first attribute value
+                         //      //wordVector[3].erase(0, 7);
+
+                         //      // Store in value string for readability 
+                         //      value1 = wordVector[4];
+
+                         //      // Now to get our second value
+                         //      // Take off the ");" at the end
+                         //      oldSize = wordVector[5].size();
+                         //      newSize = oldSize - 2;
+                         //      wordVector[5].resize(newSize);
+
+                         //      // Store in value string for readability 
+                         //      value2 = wordVector[5];
+
+                         //      // Load up our value vector with the values
+                         //      valueHolder.push_back(value1);
+                         //      valueHolder.push_back(value2);
+
+                         //      // Pass our value vector to the table object so we can add the 
+                         //      // values to their corresponding attribute objects
+                         //      databaseVector[i].tables[j].addValues(valueHolder);
+
+                         //      std::cout << "1 new record inserted.\n";
+
+                         //      valueHolder.clear();
+
+                         // }
                          
 
 

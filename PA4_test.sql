@@ -26,11 +26,7 @@ select * from Flights;
 -- On P2:
 select * from Flights;
 
----------------------
--- Expected output --
----------------------
-
--- On P1:
+--------- On P1 ----------
 -- Database CS457_PA4 created.
 -- Using database CS457_PA4.
 -- Table Flights created.
@@ -42,20 +38,16 @@ select * from Flights;
 -- Transaction committed.
 -- seat int | status int
 -- 22 | 1
--- 23 | 1
+-- 23 | 1 
 
-
--- On P2:
+---------- On P2------------
 -- Using database CS457_PA4.
-
 -- seat int | status int
 -- 22 | 0
 -- 23 | 1
-
 -- Transaction starts.
 -- Error: Table Flights is locked!
 -- Transaction abort.
-
 -- seat int | status int
 -- 22 | 0
 -- 23 | 1
