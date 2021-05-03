@@ -21,4 +21,4 @@
 
 
 clean:
-	rm -f driver
+	rm -f driver rm -f Flights.txt
