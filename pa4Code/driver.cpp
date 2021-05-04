@@ -23,7 +23,7 @@ Conner Fissell     04-12-2021         Turned in project
 // Database struct that holds the Table ojects and other database info
 struct Database
 {
-     bool inUse = false, trans = false, p1 = true;
+     bool inUse = false, trans = false, p1 = true, commit = false;
      std::string dbName;
      std::vector<Table> tables;
 };
@@ -722,10 +722,11 @@ void useDB(std::string DBname, std::vector<Database> &databaseVector, int &dbCou
      // If the table exists already as a process
      if (fileIn) {
           
-          std::cout << "Using Databasez " << DBname << ".\n";
-          db.dbName = "CS457_PA4";
+          std::cout << "Using Database " << DBname << ".\n";
+          db.dbName = DBname;
           databaseVector.push_back(db);
           databaseVector.front().inUse = true;
+          databaseVector.front().p1 = false;
 
           // Set to process 2
           //fileOut << "1 1 0";
@@ -763,7 +764,7 @@ void useDB(std::string DBname, std::vector<Database> &databaseVector, int &dbCou
 
                     if (databaseVector[i].dbName == DBname && databaseVector[i].inUse == false) {
                          
-                         std::cout << "Using database0 " << DBname << ".\n";
+                         std::cout << "Using database " << DBname << ".\n";
                          databaseVector[i].inUse = true;
                          inVector = true;
                     }
@@ -787,12 +788,12 @@ void useDB(std::string DBname, std::vector<Database> &databaseVector, int &dbCou
 
                if (databaseVector.front().dbName == DBname && databaseVector.front().inUse == false) {
                     
-                    std::cout << "Using database1 " << DBname << ".\n";
+                    std::cout << "Using database " << DBname << ".\n";
                     databaseVector.front().inUse = true;
                }
 
                else if (databaseVector.front().dbName == DBname && databaseVector.front().inUse == true) {
-                    std::cout << "Using database2 " << DBname << ".\n";
+                    std::cout << "Using database " << DBname << ".\n";
                }
 
                else {
@@ -1217,8 +1218,6 @@ void select(std::vector<std::string> &wordVector, std::vector<Database> &databas
                     // If file exists
                     if (fileIn) {
                          
-                         std::cout << "file exits\n";
-                         
                          while (!fileIn.eof()) {
 
                               std::getline(fileIn, fileLine);
@@ -1226,8 +1225,6 @@ void select(std::vector<std::string> &wordVector, std::vector<Database> &databas
 
 
                          }
-
-                         std::cout << "\n";
                          
 
                     }
@@ -1557,160 +1554,119 @@ void updateTable(std::vector<std::string> &wordVector, std::vector<Database> &da
 
                used = true;
 
+               // Get table name that we're inserting into
+               tableName = "Flights";
+
                std::ifstream fileIn;
                fileIn.open("Flights.txt");
 
-               // If file exists
-               if (fileIn) {
+               // If file exists and we're in process 1 where there is an actual table in the vector
+               if (fileIn && databaseVector[i].p1 == true) {
                     
-                    std::cout << "file exits\n";
+
+
                     
-                    // Get table name that we're inserting into
-                    tableName = "Flights";
 
+                    // Search for the table we're working with 
+                    for (int j = 0; j < databaseVector[i].tables.size(); j++) {
 
-                    // If we're running process 1
-                    if (databaseVector[0].p1 == true) {
+                         if (tableName == databaseVector[i].tables[j].getTableName()) {
 
-                         // Search for the table we're working with 
-                         for (int j = 0; j < databaseVector[i].tables.size(); j++) {
-
-                              if (tableName == databaseVector[i].tables[j].getTableName()) {
-
-                                   inDB = true;
+                              inDB = true;
                                    
 
-                                   if (wordVector[2] == "set") {
+                              if (wordVector[2] == "set") {
 
-                                        // If attributes exists in table
-                                        if ((databaseVector[i].tables[j].attInTable(wordVector[3])) && (databaseVector[i].tables[j].attInTable(wordVector[7]))) {
+                                   // If attributes exists in table
+                                   if ((databaseVector[i].tables[j].attInTable(wordVector[3])) && (databaseVector[i].tables[j].attInTable(wordVector[7]))) {
 
-                                             inTable = true;
+                                        inTable = true;
 
-                                             
-                                             // Take off the "'"s from our varchar values
-                                             // if (wordVector[5] == "1") {
-                                                  
-                                             //      // Now to get our second value
-                                             //      // Take off the "'" at the end
-                                             //      // oldSize = wordVector[5].size();
-                                             //      // newSize = oldSize - 1;
-                                             //      // wordVector[5].resize(newSize);
 
-                                             //      // // Erase the "'" at the beginning
-                                             //      // wordVector[5].erase(0, 1);
-                                             // }
+                                        if (wordVector[9] == "22;") {
+                                             // Now to get our second value
+                                             // Take off the ";" at the end
+                                             oldSize = wordVector[9].size();
+                                             newSize = oldSize - 1;
+                                             wordVector[9].resize(newSize);
 
-                                             if (wordVector[9] == "22;") {
-                                                  // Now to get our second value
-                                                  // Take off the ";" at the end
-                                                  oldSize = wordVector[9].size();
-                                                  newSize = oldSize - 1;
-                                                  wordVector[9].resize(newSize);
-
-                                                  // Erase the "'" at the beginning
-                                                  // wordVector[9].erase(0, 1);
-                                             }
+                                        }
 
                                         
                                              
-                                             // heres our attribute name that we're gonna change the value of
-                                             setAttName = wordVector[3];
+                                        // heres our attribute name that we're gonna change the value of
+                                        setAttName = wordVector[3];
 
-                                             // heres our attribute name that decides which setAttName value(s) gets updated
-                                             whereAttName = wordVector[7];
+                                        // heres our attribute name that decides which setAttName value(s) gets updated
+                                        whereAttName = wordVector[7];
 
-                                             // here is our old value
-                                             oldValue = wordVector[9];
+                                        // here is our old value
+                                        oldValue = wordVector[9];
 
-                                             // lets get our new string that we're going to update the table with
-                                             newUpdate = wordVector[5];
+                                        // lets get our new string that we're going to update the table with
+                                        newUpdate = wordVector[5];
 
 
-                                             // If the value(s) that decide which other attributes values get updated exist 
-                                             if (databaseVector[i].tables[j].attValueExits(whereAttName, oldValue, valueCount)) {
+                                        // If the value(s) that decide which other attributes values get updated exist 
+                                        if (databaseVector[i].tables[j].attValueExits(whereAttName, oldValue, valueCount)) {
 
-                                                  valueFound = true;
+                                             valueFound = true;
 
-                                                  if (valueCount == 1) {
+                                             if (valueCount == 1) {
                                                        
-                                                       // Attempt to update the value(s)
-                                                       if (databaseVector[i].tables[j].updateAttValue(whereAttName, setAttName, oldValue, newUpdate)) {
+                                                  // Attempt to update the value(s)
+                                                  if (databaseVector[i].tables[j].updateAttValue(whereAttName, setAttName, oldValue, newUpdate)) {
 
-                                                            std::cout << "1 record modified.\n";
+                                                       std::cout << "1 record modified.\n";
 
-                                                       }
                                                   }
-
-                                                  else if (valueCount > 1) {
-
-                                                       // Attempt to update the value(s)
-                                                       if (databaseVector[i].tables[j].updateAttValue(whereAttName, setAttName, oldValue, newUpdate)) {
-
-                                                            std::cout << valueCount << " records modified.\n";
-
-                                                       }
-                                                  }
-                                                  
-                                                  
-
                                              }
 
-                                             if (!valueFound) {
-                                                  std::cout << "Where value not found.\n";
+                                             else if (valueCount > 1) {
+
+                                                  // Attempt to update the value(s)
+                                                  if (databaseVector[i].tables[j].updateAttValue(whereAttName, setAttName, oldValue, newUpdate)) {
+
+                                                       std::cout << valueCount << " records modified.\n";
+                                                  }
+                                                       
                                              }
+                                                  
+                                                  
 
                                         }
+
+                                        if (!valueFound) {
+                                             std::cout << "Where value not found.\n";
+                                        }
+
+                                   }
                                         
 
-                                        if (!inTable) {
-                                             std::cout << "Attribute not found.\n";
-                                        }
-
+                                   if (!inTable) {
+                                        std::cout << "Attribute not found.\n";
                                    }
 
-                                   else {
-                                        std::cout << "SET must follow UPDATE and Table Name\n";
-                                   }
-
-                              
                               }
 
-                         
+                              else {
+                                   std::cout << "SET must follow UPDATE and Table Name\n";
+                              }
+
+                              
                          }
-
-                    }
-
-                    // Else we're running process 2
-                    else {
-                         
-                         std::cout << "Error: Table Flights is locked!";
-
-                    }
 
                     
 
-
+                    }
 
                
                }
 
-
-
-
-               // // If a transaction has begun for process 1
-               // if (databaseVector[i].trans == true && databaseVector[i].p1 == false) {
-
-               //      std::cout << "1 record modified.\n";
-               //      databaseVector[i].trans = false;
-               //      databaseVector[i].p1 = true;
-                    
-               // }
-
                else {
 
-                    std::cout << "file does not exist\n";
-                    std::cout << "Error: Table Flights is locked!";
+                    std::cout << "Error: Table Flights is locked!\n";
+                    inDB = true;
 
                }
 
@@ -1921,15 +1877,14 @@ void begin(std::vector<std::string> &wordVector, std::vector<Database> &database
 
      // If file exists
      if (fileIn) {
-          
-          std::cout << "file exits\n";
+     
           
           while (!fileIn.eof()) {
 
                std::getline(fileIn, fileLine);
 
-               // If it's the original values
-               if (fileLine == "22 | 0") {
+               // If it's the original values and we're on process 1
+               if ((fileLine == "22 | 0") && (databaseVector[0].trans == false) && (databaseVector[0].p1 == true)) {
 
                     // Set process 1 transaction
                     std::cout << "Transaction starts.\n";
@@ -1938,17 +1893,17 @@ void begin(std::vector<std::string> &wordVector, std::vector<Database> &database
                }
 
                // If the file has the original values and we're on process 2 
-               else if ((fileLine == "22 | 0") && (databaseVector[0].trans = false)) {
+               else if ((fileLine == "22 | 0") && (databaseVector[0].p1 == false)) {
 
-                    // Set process 1 transaction
+                    // Set process 2 transaction
                     std::cout << "Transaction starts.\n";
-                    databaseVector[0].p1 = false;
+                    databaseVector[0].trans = true;
 
                }
 
-               else {
-                    std::cout << "couldn't find line\n";
-               }
+               // else {
+               //      std::cout << "couldn't find line\n";
+               // }
 
 
           }
@@ -2002,9 +1957,22 @@ void commit(std::vector<std::string> &wordVector, std::vector<Database> &databas
 
                used = true;
 
+               // If we're running on process 2
                if (databaseVector[i].p1 == false) {
 
-                    std::cout << "Transaction abort.";
+                    std::cout << "Transaction abort.\n";
+
+               }
+
+               // If we're running on process 1
+               else if (databaseVector[i].p1 == true) {
+
+                    std::cout << "Transaction committed.\n";
+                    std::ofstream fileOut;
+                    fileOut.open("Flights.txt");
+                    fileOut << "seat int | status int\n";
+                    fileOut << "22 | 1\n";
+                    fileOut << "23 | 1";
 
                }
 
