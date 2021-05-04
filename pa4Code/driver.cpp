@@ -1135,37 +1135,6 @@ void insert(std::vector<std::string> &wordVector, std::vector<Database> &databas
                               valueHolder.clear();
 
                          }
-
-                         // else if (tableName == "Sales") {
-
-                         //      // Erase the beginning string characters off of our first attribute value
-                         //      //wordVector[3].erase(0, 7);
-
-                         //      // Store in value string for readability 
-                         //      value1 = wordVector[4];
-
-                         //      // Now to get our second value
-                         //      // Take off the ");" at the end
-                         //      oldSize = wordVector[5].size();
-                         //      newSize = oldSize - 2;
-                         //      wordVector[5].resize(newSize);
-
-                         //      // Store in value string for readability 
-                         //      value2 = wordVector[5];
-
-                         //      // Load up our value vector with the values
-                         //      valueHolder.push_back(value1);
-                         //      valueHolder.push_back(value2);
-
-                         //      // Pass our value vector to the table object so we can add the 
-                         //      // values to their corresponding attribute objects
-                         //      databaseVector[i].tables[j].addValues(valueHolder);
-
-                         //      std::cout << "1 new record inserted.\n";
-
-                         //      valueHolder.clear();
-
-                         // }
                          
 
 
@@ -1861,8 +1830,8 @@ void deleteRecords(std::vector<std::string> &wordVector, std::vector<Database> &
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          deleteRecords()
-DESCRIPTION:       removes specific data values from the table 
+FUNCTION:          begin()
+DESCRIPTION:       controls how the transactions are handled by different processes. 
 RETURNS:           void
 NOTES:             
 ------------------------------------------------------------------------------- */
@@ -1901,10 +1870,6 @@ void begin(std::vector<std::string> &wordVector, std::vector<Database> &database
 
                }
 
-               // else {
-               //      std::cout << "couldn't find line\n";
-               // }
-
 
           }
              
@@ -1919,23 +1884,12 @@ void begin(std::vector<std::string> &wordVector, std::vector<Database> &database
      }
 
      
-
-
-
-
-
-
-
-
-     // Take off the ";" at the end of transaction
-     // oldSize = wordVector[1].size();
-     // newSize = oldSize - 1;
-     // wordVector[1].resize(newSize);
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          deleteRecords()
-DESCRIPTION:       removes specific data values from the table 
+FUNCTION:          commit()
+DESCRIPTION:       allows a transaction to hold across multiple terminal window
+                    instantiations of the program.
 RETURNS:           void
 NOTES:             
 ------------------------------------------------------------------------------- */
